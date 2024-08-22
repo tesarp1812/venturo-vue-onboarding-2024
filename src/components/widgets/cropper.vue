@@ -1,50 +1,23 @@
 <template>
-  <div
-    v-if="!localCroppedImageUrl"
-    class="dropzone"
-    @dragover.prevent="onDragOver"
-    @dragleave="onDragLeave"
-    @drop.prevent="onDrop"
-    :class="{ 'dropzone-active': isDragging }"
-  >
-    <label for="dropzoneFile"  role="button">
+  <div v-if="!localCroppedImageUrl" class="dropzone" @dragover.prevent="onDragOver" @dragleave="onDragLeave"
+    @drop.prevent="onDrop" :class="{ 'dropzone-active': isDragging }">
+    <label for="dropzoneFile" role="button">
       <div class="dz-message needsclick text-center">
         <div class="mb-3">
           <i class="display-4 text-muted bx bxs-cloud-upload"></i>
         </div>
-        <h4>{{uploadText}}</h4>
+        <h4>{{ uploadText }}</h4>
       </div>
     </label>
-    <input
-      type="file"
-      id="dropzoneFile"
-      class="dropzoneFile btn btn-light"
-      @change="onFileChange"
-    />
+    <input type="file" id="dropzoneFile" class="dropzoneFile btn btn-light" @change="onFileChange" />
   </div>
-  <BModal
-    v-model="cropModal"
-    title="Crop Image"
-    ok-title="Crop"
-    @ok="cropImage"
-  >
-    <vue-cropper
-      v-if="localImageUrl"
-      ref="cropper"
-      :src="localImageUrl"
-      :aspect-ratio="aspectRatio"
-      :view-mode="1"
-      :auto-crop-area="1"
-      :background="false"
-      :guides="false"
-      class="cropper"
-    />
+  <BModal v-model="cropModal" title="Crop Image" ok-title="Crop" @ok="cropImage">
+    <vue-cropper v-if="localImageUrl" ref="cropper" :src="localImageUrl" :aspect-ratio="aspectRatio" :view-mode="1"
+      :auto-crop-area="1" :background="false" :guides="false" class="cropper" />
   </BModal>
   <div v-if="localCroppedImageUrl" class="preview d-flex">
     <div class="delete-button" @click="clearCroppedImage">
-      <BButton class="btn btn-sm btn-danger"
-        ><i class="mdi mdi-delete-outline"></i
-      ></BButton>
+      <BButton class="btn btn-sm btn-danger"><i class="mdi mdi-delete-outline"></i></BButton>
     </div>
     <img :src="localCroppedImageUrl" alt="Cropped Image" class="mx-auto" />
   </div>
@@ -77,6 +50,10 @@ export default {
       type: String,
       default: "Letakkan gambar disini atau klik untuk mengunggah",
     },
+    maxFileSize: { 
+      type: Number,
+      default: 2 * 1024 * 1024,
+    },
   },
   data() {
     return {
@@ -92,7 +69,7 @@ export default {
     },
     localCroppedImageUrl(newVal) {
       this.$emit("update:croppedImageUrl", newVal);
-    },
+    }
   },
   methods: {
     onDragOver() {
@@ -116,10 +93,23 @@ export default {
     onFileChange(event) {
       const file = event.target.files[0];
       if (file) {
-        this.localImageUrl = URL.createObjectURL(file);
-        this.cropModal = true;
+        if (file.size > this.maxFileSize) {
+          this.clearCroppedImage();
+          this.$emit("file-too-large", `Ukuran file melebihi ${this.maxFileSize / 1024 / 1024}MB. Silakan unggah file yang lebih kecil.`);
+        } else {
+          this.localImageUrl = URL.createObjectURL(file);
+          this.cropModal = true;
+        }
       }
     },
+
+    // onFileChange(event) {
+    //   const file = event.target.files[0];
+    //   if (file) {
+    //     this.localImageUrl = URL.createObjectURL(file);
+    //     this.cropModal = true;
+    //   }
+    // },
     cropImage() {
       const canvas = this.$refs.cropper.getCroppedCanvas();
       if (canvas) {
@@ -138,18 +128,22 @@ export default {
 .image-cropper {
   text-align: center;
 }
+
 .cropper {
   max-width: 100%;
   margin-top: 20px;
 }
+
 .preview {
   border: 2px dashed var(--bs-border-color) !important;
   border-radius: 6px;
   margin-top: 20px;
 }
+
 .preview img {
   max-width: 100%;
 }
+
 .dropzone {
   display: flex;
   flex-direction: column;
@@ -180,6 +174,7 @@ export default {
 .active-dropzone {
   color: #fff;
   border-color: #fff;
+
   label {
     background-color: #fff;
   }

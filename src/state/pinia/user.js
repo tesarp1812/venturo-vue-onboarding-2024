@@ -33,8 +33,6 @@ export const useUserStore = defineStore('user', {
             try {
                 const url = `${this.apiUrl}/api/v1/users?page=${this.current}&perPage=${this.perpage}&name=${this.searchQuery}`;
                 const res = await axios.get(url);
-
-
                 const usersDataList = res.data.data.list
                 this.users = usersDataList
                 this.totalData = res.data.data.meta.total

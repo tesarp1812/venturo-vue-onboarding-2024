@@ -9,7 +9,7 @@ export const showSuccessToast = (title, text = '') => {
     toast: true,
     position: 'top-end',
     showConfirmButton: false,
-    timer: 3000
+    timer: 10000
   });
 };
 
@@ -22,7 +22,7 @@ export const showErrorToast = (title, text = '') => {
     toast: true,
     position: 'top-end',
     showConfirmButton: false,
-    timer: 3000
+    timer: 10000
   });
 };
 

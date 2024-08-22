@@ -1,20 +1,21 @@
 <template>
     <Layout>
         <PageHeader title="Produk" pageTitle="Produk" />
-        <Brow>
+        <BRow>
             <BCol lg="12">
                 <BCard no-body>
-                    <BCardbody class="border-bottom ">
+                    <BCardBody class="border-bottom ">
                         <div class="d-flex align-items-center">
-                            <BCardTitle class="mx-3 my-3 flex-grow-1">Produk List</BCardTitle>
-                            <div class="flex-shrink-0 mx-3 my-3">
+                            <BCardTitle class="mb-0 flex-grow-1">Produk List</BCardTitle>
+                            <div class="flex-shrink-0">
                                 <BButton class="btn btn-primary me-1" @click="addProduct">Add Product
                                 </BButton>
                                 <BLink href="#!" class="btn btn-light me-1" @click="getProducts"><i
                                     class="mdi mdi-refresh"></i></BLink>
                             </div>
                         </div>
-                    </BCardbody>
+                    </BCardBody>
+                   
                     <BCardBody class="border-bottom">
                         <BRow class="g-3">
                             <BCol xxl="10" lg="8">
@@ -58,7 +59,7 @@
                                         <BTd>
                                             <ul class="list-unstyled hstack gap-1 mb-0 justify-content-end">
                                                 <li data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Edit"
-                                                @click="editProduct(product.row)">
+                                                @click="editProduct(product.id)">
                                                     <BButton class="btn btn-sm btn-soft-info"><i
                                                             class="mdi mdi-pencil-outline"></i></BButton>
                                                 </li>
@@ -79,7 +80,7 @@
                     </BCardBody>
                 </BCard>
             </BCol>
-        </Brow>
+        </BRow>
     </Layout>
  </template>
  <script setup>
@@ -94,8 +95,6 @@
  const productStore = useProductStore()
  const router = useRouter();
  const { startProgress, finishProgress, failProgress } = useProgress();
- 
- 
  const rows = ref([]);
  const getProducts = async () => {
     startProgress();
@@ -103,6 +102,7 @@
     if (productStore.products) {
         finishProgress();
         rows.value = productStore.products || [];
+        // console.log("test");
     } else {
         failProgress();
         rows.value = [];
@@ -124,9 +124,10 @@
     productStore.openForm('add')
     router.push({ name: 'product-form', params: { product: '' } });
  }
- const editProduct = (row) => {
+ const editProduct = async (id) => {
     productStore.openForm('edit')
-    router.push({ name: 'product-form', params: { product: JSON.stringify(row) } });
+    router.push({ name: 'product-form' });
+    await productStore.getProductById(id)
  }
  const updatePage = async (page) => {
     await productStore.changePage(page);
@@ -139,6 +140,4 @@
  onMounted(async () => {
     await getProducts()
  })
- 
- 
  </script>

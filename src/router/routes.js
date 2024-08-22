@@ -25,6 +25,12 @@ export default [
     component: () => import("../views/product-category")
   },
   {
+    path: "/transaction",
+    name: "transaction",
+    meta: { title: "Master Transaction", authRequired: false },
+    component: () => import("../views/transaction")
+  },
+  {
     path: "/user",
     name: "user",
     meta: { title: "Master User", authRequired: false },

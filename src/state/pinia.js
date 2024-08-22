@@ -5,8 +5,17 @@ import { useCustomerStore } from "./pinia/customer";
 import { createPinia } from "pinia";
 import { useProductCategoryStore } from "./pinia/product-category";
 import { useProductStore } from "./pinia/product";
+import { useTransitionStore } from "./pinia/transaction";
 
 const pinia = createPinia();
 export default pinia;
 
-export { useLayoutStore, useAuthStore, useUserStore, useCustomerStore, useProductCategoryStore, useProductStore };
+export {
+    useLayoutStore,
+    useAuthStore,
+    useUserStore,
+    useCustomerStore,
+    useProductCategoryStore,
+    useProductStore,
+    useTransitionStore
+};
