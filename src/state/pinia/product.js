@@ -21,7 +21,7 @@ import {
         },
         totalData: 0,
         current: 1,
-        perpage: 5,
+        perpage: 10,
         searchQuery: '',
         maxImageSize: 3 * 1024 * 1024
     }),

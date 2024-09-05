@@ -2,7 +2,6 @@
     <Layout>
         <PageHeader title="Users List" pageTitle="Users" />
 
-
         <BRow>
             <BCol lg="12">
                 <BCard no-body>
@@ -49,11 +48,34 @@
                                                             'is-invalid': !!(errorList && errorList.email),
                                                         }" id="form-email" type="email" placeholder="Masukkan email"
                                                             v-model="formModel.email" />
-
-
                                                         <template v-if="!!(errorList && errorList.email)">
                                                             <div class="invalid-feedback"
                                                                 v-for="(err, index) in errorList.email" :key="index">
+                                                                <span>{{ err }}</span>
+                                                            </div>
+                                                        </template>
+                                                    </BCol>
+                                                </BRow>
+                                                <BRow class="mb-3">
+                                                    <label for="form-roles"
+                                                        class="col-md-2 col-form-label">Roles</label>
+                                                    <BCol md="10">
+                                                        <BFormSelect class="form-select"
+                                                            v-model="formModel.user_roles_id"
+                                                            :class="{ 'is-invalid': !!(errorList && errorList.user_roles_id) }"
+                                                            id="form-roles"
+                                                            :style="{ color: formModel.user_roles_id === '' ? '#7c8094' : '' }">
+                                                            <BFormSelectOption :value="''" :disabled="true">Select Role
+                                                            </BFormSelectOption>
+                                                            <BFormSelectOption v-for="role in roles" :key="role.id"
+                                                                :value="role.id">
+                                                                {{ role.name }}
+                                                            </BFormSelectOption>
+                                                        </BFormSelect>
+                                                        <template v-if="!!(errorList && errorList.user_roles_id)">
+                                                            <div class="invalid-feedback"
+                                                                v-for="(err, index) in errorList.user_roles_id"
+                                                                :key="index">
                                                                 <span>{{ err }}</span>
                                                             </div>
                                                         </template>
@@ -64,14 +86,10 @@
                                                         class="col-md-2 col-form-label">Password</label>
                                                     <BCol md="10">
                                                         <input class="form-control" :class="{
-                                                            'is-invalid': !!(
-                                                                errorList && errorList.password
-                                                            ),
+                                                            'is-invalid': !!(errorList && errorList.password),
                                                         }" id="form-password" type="password"
                                                             placeholder="Masukkan password"
                                                             v-model="formModel.password" />
-
-
                                                         <template v-if="!!(errorList && errorList.password)">
                                                             <div class="invalid-feedback"
                                                                 v-for="(err, index) in errorList.password" :key="index">
@@ -90,15 +108,12 @@
                         </div>
                     </BCardBody>
 
-
                     <BCardBody class="border-bottom">
                         <BRow class="g-3">
                             <BCol xxl="10" lg="8">
                                 <BFormInput type="text" class="form-control search" placeholder="Search for ..."
                                     v-model="userStore.searchQuery" />
                             </BCol>
-
-
                             <BCol xxl="2" lg="4">
                                 <BButton variant="soft-secondary" @click="searchData" class="w-100">
                                     <i class="mdi mdi-magnify align-middle"></i>
@@ -107,7 +122,6 @@
                             </BCol>
                         </BRow>
                     </BCardBody>
-
 
                     <BCardBody>
                         <div class="table-responsive">
@@ -119,8 +133,6 @@
                                         <BTh scope="col"></BTh>
                                     </BTr>
                                 </BThead>
-
-
                                 <BTbody>
                                     <BTr v-for="user in rows" :key="user.id">
                                         <BTd> {{ user.name }} </BTd>
@@ -145,10 +157,8 @@
                                 </BTbody>
                             </BTableSimple>
                         </div>
-
                         <Pagination :currentPage="userStore.current" :totalRows="userStore.totalData"
                             :perPage="userStore.perpage" @update:currentPage="updatePage" />
-
                     </BCardBody>
                 </BCard>
             </BCol>
@@ -157,31 +167,53 @@
 </template>
 
 
+
 <script setup>
-import { ref, onMounted, reactive, computed } from "vue";
-import Layout from "../../layouts/main";
-import PageHeader from "@/components/page-header";
-// import Pagination from "@/components/widgets/pagination";
-import { useUserStore } from "@/state/pinia";
-import { useProgress } from "@/helpers/progress"; // Import custom progress function
-
-
-const { startProgress, finishProgress, failProgress } = useProgress();
-import ImageCropper from "@/components/widgets/cropper";
+import { ref, computed, onMounted, reactive } from 'vue';
+import Layout from '../../layouts/main';
+import Pagination from "@/components/widgets/pagination";
+import PageHeader from '@/components/page-header';
+import { useUserStore } from '@/state/pinia';
+import { useProgress } from '@/helpers/progress';
+import { useUserRolesStore } from '../../state/pinia';
+import ImageCropper from '@/components/widgets/cropper';
 import {
     showSuccessToast,
     showErrorToast,
-    showDeleteConfirmationDialog,
-} from "@/helpers/alert.js";
+    showDeleteConfirmationDialog
+} from '@/helpers/alert.js';
+import { BRow } from 'bootstrap-vue-next';
 
+const { startProgress, finishProgress, failProgress } = useProgress();
 
-// import useVuelidate from "@vuelidate/core";
+const rolesStore = useUserRolesStore();
+const roles = computed(() => rolesStore.roles);
 
+const getRoles = async () => {
+    startProgress();
+    await rolesStore.getRoles();
+    finishProgress();
+};
 
-var rows = ref([]);
-var isOpenForm = ref(false);
-var modalTitle = ref(false);
 const userStore = useUserStore();
+const rows = ref([]);
+const isOpenForm = ref(false);
+const modalTitle = ref('');
+const imageUrl = ref('');
+const croppedImageUrl = ref('');
+const formModel = reactive({
+    id: '',
+    name: '',
+    email: '',
+    password: '',
+    user_roles_id: '', // Ensure this matches the v-model binding
+    foto_url: ''
+});
+
+const errorList = computed(() => userStore.response?.list || {});
+const errorMessage = computed(() => userStore.response?.message || '');
+const statusCode = computed(() => userStore.response.status);
+
 const getUsers = async () => {
     startProgress();
     await userStore.getUsers();
@@ -193,103 +225,84 @@ const getUsers = async () => {
         rows.value = [];
     }
 };
+
 const updatePage = async (page) => {
     await userStore.changePage(page);
     await getUsers();
 };
-
 
 const searchData = async () => {
     await userStore.changePage(1);
     await getUsers();
 };
 
-
-const imageUrl = ref("");
-const croppedImageUrl = ref("");
-const formModel = reactive({
-    id: "",
-    name: "",
-    email: "",
-    password: "",
-    foto_url: "",
-});
-
-
 const openFormModal = (mode, id = null) => {
     isOpenForm.value = true;
-    if (mode === "edit" && id) {
+    if (mode === 'edit' && id) {
         const user = rows.value.find((user) => user.id === id);
         if (user) {
             formModel.id = user.id;
             formModel.name = user.name;
             formModel.email = user.email;
-            formModel.password = ""; // Password should be handled securely
+            formModel.password = ''; // Password should be handled securely
             formModel.foto_url = user.foto_url;
-            modalTitle.value = "Ubah User";
+            formModel.user_roles_id = user.user_roles_id;
+            modalTitle.value = 'Ubah User';
             imageUrl.value = user.foto_url;
         }
     } else {
-        formModel.id = "";
-        formModel.name = "";
-        formModel.email = "";
-        formModel.password = "";
-        formModel.foto_url = "";
-        modalTitle.value = "Tambah User";
+        formModel.id = '';
+        formModel.name = '';
+        formModel.email = '';
+        formModel.password = '';
+        formModel.foto_url = '';
+        formModel.user_roles_id = '';
+        modalTitle.value = 'Tambah User';
     }
 };
 
-
-const statusCode = computed(() => userStore.response.status);
-const errorList = computed(() => userStore.response?.list || {});
-const errorMessage = computed(() => userStore.response?.message || "");
 const saveUser = async () => {
     try {
         if (formModel.id) {
             await userStore.updateUser(formModel);
-            if (statusCode.value != 200) {
-                showErrorToast("Failed to add user", errorMessage.value);
+            if (statusCode.value !== 200) {
+                showErrorToast('Failed to update user', errorMessage.value);
             } else {
                 isOpenForm.value = false;
-                await getUsers(); // Refresh the user list after deletion
-                showSuccessToast("User Edited successfully!");
+                await getUsers();
+                showSuccessToast('User updated successfully!');
             }
         } else {
             await userStore.addUsers(formModel);
-
-
-            if (statusCode.value != 200) {
-                showErrorToast("Failed to add user", errorMessage.value);
+            if (statusCode.value !== 200) {
+                showErrorToast('Failed to add user', errorMessage.value);
             } else {
                 isOpenForm.value = false;
-                await getUsers(); // Refresh the user list after deletion
-                showSuccessToast("User added successfully!");
+                await getUsers();
+                showSuccessToast('User added successfully!');
             }
         }
     } catch (error) {
         console.error(error);
-        showErrorToast("Failed to add user", errorMessage.value);
+        showErrorToast('An error occurred while saving user', errorMessage.value);
     }
 };
+
 const deleteUser = async (id) => {
-    // Tampilkan dialog konfirmasi
     const confirmed = await showDeleteConfirmationDialog();
-
-
-    // Jika konfirmasi
     if (confirmed) {
         try {
             await userStore.deleteUser(id);
-            showSuccessToast("User berhasil dihapus");
-            await getUsers(); // Refresh the user list after deletion
+            showSuccessToast('User deleted successfully');
+            await getUsers();
         } catch (error) {
-            showErrorToast("Terjadi kesalahan saat menghapus user");
+            showErrorToast('An error occurred while deleting user');
         }
     }
 };
 
-
 onMounted(async () => {
     await getUsers();
+    await getRoles();
 });
 </script>

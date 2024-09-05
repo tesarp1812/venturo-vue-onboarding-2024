@@ -7,6 +7,24 @@ export default [
     component: () => import("../views/dashboards/default")
   },
   {
+    path: "/test",
+    name: "test",
+    meta: { title: "test", authRequired: false },
+    component: () => import("../views/test")
+  },
+  {
+    path: "/report/sales-menu",
+    name: "report",
+    meta: { title: "report", authRequired: false },
+    component: () => import("../views/report/report-category.vue")
+  },
+  {
+    path: "/report/sale-customer",
+    name: "report",
+    meta: { title: "report", authRequired: false },
+    component: () => import("../views/report/report-customer.vue")
+  },
+  {
     path: "/product",
     name: "product",
     meta: { title: "Master Product", authRequired: false },

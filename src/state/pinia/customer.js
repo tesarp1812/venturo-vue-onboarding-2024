@@ -21,7 +21,7 @@ export const useCustomerStore = defineStore('customer', {
         },
         totalData: 0,
         current: 1,
-        perpage: 5,
+        perpage: 7,
         searchQuery: '',
     }),
     actions: {
@@ -38,6 +38,7 @@ export const useCustomerStore = defineStore('customer', {
                 const customersDataList = res.data.data.list
                 this.customers = customersDataList
                 this.totalData = res.data.data.meta.total
+                // console.log("customer", this.customers);
             } catch (error) {
                 this.response = {
                     status: error.response?.status,
@@ -47,12 +48,10 @@ export const useCustomerStore = defineStore('customer', {
         },
         async changePage(newPage) {
             this.current = newPage;
-            await this.getCustomers();
         },
         async searchCustomers(query) {
             this.searchQuery = query;
             this.current = 1;
-            await this.getCustomers();
         },
         async addCustomers(customers) {
             console.log(customers);
@@ -111,4 +110,25 @@ export const useCustomerStore = defineStore('customer', {
             }
         }
     },
+    getters: {
+        customerOption(state) {
+            return state.customers.map(cust => ({
+                label: cust.name,
+                value: cust.id
+            }))
+        },
+        customerOptionsWithAll(state) {
+            const allOption = {
+                value: [],
+                label: 'All'
+            };
+
+            const customerOptions = state.customers.map(cust => ({
+                label: cust.name,
+                value: cust.id
+            }));
+
+            return [allOption, ...customerOptions];
+        }
+    }
 })

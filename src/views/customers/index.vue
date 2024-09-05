@@ -1,8 +1,6 @@
 <template>
     <Layout>
         <PageHeader title="Customers List" pageTitle="Customers" />
-
-
         <BRow>
             <BCol lg="12">
                 <BCard no-body>
@@ -90,15 +88,12 @@
                         </div>
                     </BCardBody>
 
-
                     <BCardBody class="border-bottom">
                         <BRow class="g-3">
                             <BCol xxl="10" lg="8">
                                 <BFormInput type="text" class="form-control search" placeholder="Search for ..."
                                     v-model="customerStore.searchQuery" />
                             </BCol>
-
-
                             <BCol xxl="2" lg="4">
                                 <BButton variant="soft-secondary" @click="searchData" class="w-100">
                                     <i class="mdi mdi-magnify align-middle"></i>
@@ -108,10 +103,10 @@
                         </BRow>
                     </BCardBody>
 
-
                     <BCardBody>
                         <div class="table-responsive">
-                            <BTableSimple class="align-middle dt-responsive nowrap w-100 table-check" id="customer-list">
+                            <BTableSimple class="align-middle dt-responsive nowrap w-100 table-check"
+                                id="customer-list">
                                 <BThead>
                                     <BTr>
                                         <BTh scope="col">Name</BTh>
@@ -148,7 +143,6 @@
 
                         <Pagination :currentPage="customerStore.current" :totalRows="customerStore.totalData"
                             :perPage="customerStore.perpage" @update:currentPage="updatePage" />
-
                     </BCardBody>
                 </BCard>
             </BCol>
@@ -161,7 +155,7 @@
 import { ref, onMounted, reactive, computed } from "vue";
 import Layout from "../../layouts/main";
 import PageHeader from "@/components/page-header";
-// import Pagination from "@/components/widgets/pagination";
+import Pagination from "@/components/widgets/pagination";
 import { useCustomerStore } from "@/state/pinia";
 import { useProgress } from "@/helpers/progress"; // Import custom progress function
 

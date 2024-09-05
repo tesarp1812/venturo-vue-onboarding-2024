@@ -5,7 +5,11 @@ import { useCustomerStore } from "./pinia/customer";
 import { createPinia } from "pinia";
 import { useProductCategoryStore } from "./pinia/product-category";
 import { useProductStore } from "./pinia/product";
-import { useTransitionStore } from "./pinia/transaction";
+import { useTransactionStore } from "./pinia/transaction";
+import { useTestStore } from "./pinia/test";
+import { useUserRolesStore} from "./pinia/user-roles";
+import { useReportCategoryStore } from "./pinia/report-category";
+import { useReportCustomerStore } from "./pinia/report-customer";
 
 const pinia = createPinia();
 export default pinia;
@@ -17,5 +21,9 @@ export {
     useCustomerStore,
     useProductCategoryStore,
     useProductStore,
-    useTransitionStore
+    useTransactionStore,
+    useTestStore,
+    useUserRolesStore,
+    useReportCustomerStore,
+    useReportCategoryStore
 };
